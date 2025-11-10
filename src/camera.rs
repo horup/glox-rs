@@ -50,7 +50,7 @@ pub trait Camera {
 
         let world_far = world_far_h.xyz() / world_far_h.w;
 
-        let dir = self.direction().normalize_or_zero();
+        let dir = world_far - self.eye();
         Ray {
             origin: self.eye(),
             dir,
