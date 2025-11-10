@@ -79,11 +79,10 @@ pub fn ply_vertices(source:&str) -> Result<Vec<Vertex>, ()> {
     Ok(vertices)
 }
 
-pub fn wall_vertices(bottom_center: Vec3, color: Vec4, normal: Vec3) -> [Vertex; 6] {
+pub fn wall_vertices(bottom_center: Vec3, height:f32, color: Vec4, normal: Vec3) -> [Vertex; 6] {
     let up = Vec3::new(0.0, 0.0, 1.0);
     let right = normal.cross(up).normalize();
     let half_width = 0.5;
-    let height = 2.0;
 
     let top_center = bottom_center + up * height;
 

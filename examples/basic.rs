@@ -1,4 +1,4 @@
-use ggsdk::{GGAtlas, GGRunOptions};
+use ggsdk::{GGAtlas, GGRunOptions, egui::Key};
 use glam::{Vec2, Vec3, Vec4};
 use glox::Glox;
 
@@ -31,10 +31,38 @@ impl ggsdk::GGApp for App {
     }
 
     fn update_glow(&mut self, g: ggsdk::UpdateContext) {
+        let mut move_vec = Vec2::new(0.0, 0.0);
+        let mut rot = 0.0;
         g.egui_ctx.input(|x|{
             let r = x.content_rect();
             self.glox.camera.viewport_size = Vec2::new(r.width(), r.height());
+
+            if x.key_down(Key::W) {
+                move_vec.y = 1.0;
+            }
+            if x.key_down(Key::S) {
+                move_vec.y = -1.0;
+            }
+            if x.key_down(Key::A) {
+                move_vec.x = -1.0;
+            }
+            if x.key_down(Key::D) {
+                move_vec.x = 1.0;
+            }
+            if x.key_down(Key::Q) {
+                rot = -1.0;
+            }
+            if x.key_down(Key::E) {
+                rot = 1.0;
+            }
         });
+
+        let d = g.dt;
+        let speed = 10.0;
+        let f = move_vec.extend(0.0) * d * speed;
+
+        self.glox.camera.rotate_self(rot * d);
+        self.glox.camera.eye += f;
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
@@ -44,7 +72,8 @@ impl ggsdk::GGApp for App {
         let gl = g.painter.gl();
         let mut draw = self.glox.draw_builder(gl);
         draw.bind_texture(Some(texture));
-        draw.push_vertices(&glox::billboard_vertices(Default::default(), Vec4::splat(1.0), camera_dir, Vec2::splat(1.0)));
+      //  draw.push_vertices(&glox::billboard_vertices(Default::default(), Vec4::splat(1.0), camera_dir, Vec2::splat(1.0)));
+        draw.push_vertices(&glox::wall_vertices(Default::default(), 1.0, Vec4::splat(1.0), Vec3::new(0.0, 1.0, 0.0)));
         draw.build();
     }
 }
