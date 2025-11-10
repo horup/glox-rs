@@ -6,10 +6,7 @@ use crate::Ray;
 
 pub trait Camera {
     fn viewport_size(&self) -> Vec2;
-    fn set_viewport_size(&mut self, size: Vec2);
-
     fn view(&self) -> Mat4;
-
     fn projection(&self) -> Mat4 {
         glam::Mat4::perspective_rh_gl(PI / 4.0, self.aspect(), 0.1, 1024.0)
     }
@@ -114,10 +111,6 @@ impl OrbitalCamera {
 impl Camera for OrbitalCamera {
     fn viewport_size(&self) -> Vec2 {
         self.viewport_size
-    }
-
-    fn set_viewport_size(&mut self, size: Vec2) {
-        self.viewport_size = size;
     }
 
     fn view(&self) -> Mat4 {
