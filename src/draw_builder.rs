@@ -7,7 +7,6 @@ pub struct DrawBuilder<'a> {
     gl: &'a glow::Context,
     first: usize,
     count: usize,
-    camera:&'a dyn Camera
 }
 
 impl<'a> DrawBuilder<'a> {
@@ -69,7 +68,6 @@ impl<'a> DrawBuilder<'a> {
                 gl,
                 first,
                 count: 0,
-                camera
             }
         }
     }

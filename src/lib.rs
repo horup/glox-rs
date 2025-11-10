@@ -10,7 +10,6 @@ pub use draw_builder::*;
 mod vertex;
 pub use vertex::*;
 
-use glam::{Vec3, Vec4};
 use glow::{HasContext, Program};
 use std::mem::size_of;
 
