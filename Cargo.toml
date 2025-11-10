@@ -4,4 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-glow = "0.16.0"
+glow = ">=0.16.0"
+glam = ">=0.27"
+ply-rs = "0.1.3"
+
+[dev-dependencies]
+ggsdk = "0.1.10"
