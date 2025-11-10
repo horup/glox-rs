@@ -17,7 +17,7 @@ use std::mem::size_of;
 #[derive(Default)]
 pub struct Glox {
     program: Option<Program>,
-    pub camera: Camera,
+    pub camera: OrbitalCamera,
     pub vertex_array: Option<glow::VertexArray>,
     pub vertex_buffers: Vec<glow::Buffer>,
     pub vertex_buffer_current: usize,

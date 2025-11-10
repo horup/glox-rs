@@ -1,6 +1,6 @@
 use glow::HasContext as _;
 
-use crate::{Glox, Vertex};
+use crate::{Camera, Glox, Vertex};
 
 pub struct DrawBuilder<'a> {
     renderer: &'a mut Glox,
