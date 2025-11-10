@@ -1,32 +1,36 @@
 use ggsdk::GGRunOptions;
-use glam::{Vec3, Vec4};
-use glox::{Camera, Glox};
+use glam::{Vec2, Vec3, Vec4};
+use glox::Glox;
 
 #[derive(Default)]
 struct App {
-    pub glox:Glox
+    pub glox: Glox,
 }
 
 impl ggsdk::GGApp for App {
     fn init(&mut self, g: ggsdk::InitContext) {
         self.glox.init(g.gl);
+        self.glox.camera.eye = Vec3::new(0.0, -10.0, 0.5);
+        self.glox.camera.target = Vec3::default();
     }
 
-    fn update(&mut self, g: ggsdk::UpdateContext) {
-       
-    }
+    fn update(&mut self, g: ggsdk::UpdateContext) {}
 
-    fn paint_glow(&mut self, g:ggsdk::PaintGlowContext) {
+    fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
+        let camera_dir= self.glox.camera.direction();
         let gl = g.painter.gl();
         let mut draw = self.glox.draw_builder(gl);
-        draw.push_vertices(&glox::floor_vertices(Vec3::new(0.0, 0.0, 0.0), Vec4::new(1.0, 1.0, 1.0, 1.0)));
+        draw.push_vertices(&glox::billboard_vertices(Default::default(), Vec4::splat(1.0), camera_dir, Vec2::splat(1.0)));
         draw.build();
     }
 }
 
 fn main() {
     let app = App::default();
-    ggsdk::GGEngine::run(app, GGRunOptions {
-        ..Default::default()
-    });
+    ggsdk::GGEngine::run(
+        app,
+        GGRunOptions {
+            ..Default::default()
+        },
+    );
 }
