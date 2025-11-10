@@ -33,6 +33,29 @@ pub trait Camera {
             (1.0 - p.y) / 2.0 * viewport.y,
         )
     }
+
+    fn direction(&self) -> Vec3;
+    fn eye(&self) -> Vec3;
+
+    fn screen_ray(&self, screen_pos: Vec2) -> Ray {
+        let inv_vp = self.view_projection().inverse();
+        let viewport = self.viewport_size();
+
+        let ndc_x = (2.0 * screen_pos.x) / viewport.x - 1.0;
+        let ndc_y = 1.0 - (2.0 * screen_pos.y) / viewport.y;
+
+        let ndc_far = Vec4::new(ndc_x, ndc_y, 1.0, 1.0);
+
+        let world_far_h = inv_vp * ndc_far;
+
+        let world_far = world_far_h.xyz() / world_far_h.w;
+
+        let dir = self.direction().normalize_or_zero();
+        Ray {
+            origin: self.eye(),
+            dir,
+        }
+    }
 }
 
 #[derive(Default)]
@@ -87,25 +110,6 @@ impl OrbitalCamera {
         v.normalize_or(Vec3::new(1.0, 0.0, 0.0))
     }
 
-    pub fn screen_ray(&self, screen_pos: Vec2) -> Ray {
-        let inv_vp = self.view_projection().inverse();
-        let viewport = self.viewport_size();
-
-        let ndc_x = (2.0 * screen_pos.x) / viewport.x - 1.0;
-        let ndc_y = 1.0 - (2.0 * screen_pos.y) / viewport.y;
-
-        let ndc_far = Vec4::new(ndc_x, ndc_y, 1.0, 1.0);
-
-        let world_far_h = inv_vp * ndc_far;
-
-        let world_far = world_far_h.xyz() / world_far_h.w;
-
-        let dir = (world_far - self.eye).normalize();
-        Ray {
-            origin: self.eye,
-            dir,
-        }
-    }
 }
 
 impl Camera for OrbitalCamera {
@@ -121,5 +125,13 @@ impl Camera for OrbitalCamera {
         let up = right.cross(forward);
 
         Mat4::look_at_rh(self.eye, self.target, up)
+    }
+    
+    fn direction(&self) -> Vec3 {
+        (self.target - self.eye).normalize_or_zero()
+    }
+    
+    fn eye(&self) -> Vec3 {
+        self.eye
     }
 }
