@@ -12,7 +12,7 @@ use ply_rs as ply;
 use std::mem::size_of;
 
 #[derive(Default)]
-pub struct Renderer {
+pub struct Glox {
     program: Option<Program>,
     pub camera: Camera,
     pub vertex_array: Option<glow::VertexArray>,
@@ -22,7 +22,7 @@ pub struct Renderer {
     pub vertex_buffer_vertex_index: usize,
 }
 
-impl Renderer {
+impl Glox {
     pub fn init(&mut self, gl: &glow::Context) {
         self.camera.eye.z = 10.0;
         self.camera.eye.x = 0.0;

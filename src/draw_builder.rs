@@ -1,9 +1,9 @@
 use glow::HasContext as _;
 
-use crate::{Renderer, Vertex};
+use crate::{Glox, Vertex};
 
 pub struct DrawBuilder<'a> {
-    renderer: &'a mut Renderer,
+    renderer: &'a mut Glox,
     gl: &'a glow::Context,
     first: usize,
     count: usize,
@@ -21,7 +21,7 @@ impl<'a> DrawBuilder<'a> {
         self
     }
 
-    pub fn new(renderer: &'a mut Renderer, gl: &'a glow::Context) -> Self {
+    pub fn new(renderer: &'a mut Glox, gl: &'a glow::Context) -> Self {
         unsafe {
             let program = renderer.program.expect("no program");
             let vertex_buffer = renderer.vertex_buffers[renderer.vertex_buffer_current];
