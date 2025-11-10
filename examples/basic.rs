@@ -14,7 +14,16 @@ impl ggsdk::GGApp for App {
         self.glox.camera.target = Vec3::default();
     }
 
-    fn update(&mut self, g: ggsdk::UpdateContext) {}
+    fn update(&mut self, _: ggsdk::UpdateContext) {
+
+    }
+
+    fn update_glow(&mut self, g: ggsdk::UpdateContext) {
+        g.egui_ctx.input(|x|{
+            let r = x.content_rect();
+            self.glox.camera.viewport_size = Vec2::new(r.width(), r.height());
+        });
+    }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
         let camera_dir= self.glox.camera.direction();
