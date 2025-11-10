@@ -2,6 +2,8 @@
 name = "glox"
 version = "0.1.0"
 edition = "2024"
+license = "MIT"
+description = "A Reusable OpenGL renderer using GLOW"
 
 [dependencies]
 glow = ">=0.16.0"
