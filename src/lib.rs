@@ -17,7 +17,6 @@ use std::mem::size_of;
 #[derive(Default)]
 pub struct Glox {
     program: Option<Program>,
-    pub camera: OrbitalCamera,
     pub vertex_array: Option<glow::VertexArray>,
     pub vertex_buffers: Vec<glow::Buffer>,
     pub vertex_buffer_current: usize,
@@ -27,9 +26,6 @@ pub struct Glox {
 
 impl Glox {
     pub fn init(&mut self, gl: &glow::Context) {
-        self.camera.eye.z = 10.0;
-        self.camera.eye.x = 0.0;
-        self.camera.eye.y = -10.0;
         self.vertex_buffer_len = 1024 * 1024; // 1 million vertices
         unsafe {
             self.vertex_array = Some(
@@ -79,26 +75,7 @@ impl Glox {
         self.vertex_buffer_current = (self.vertex_buffer_current + 1) % self.vertex_buffers.len();
     }
 
-    pub fn draw_grid(&mut self, gl: &glow::Context, grid_size: u32) {
-        let mut builder = DrawBuilder::new(self, gl);
-        let mut i = 0;
-        for y in 0..grid_size {
-            for x in 0..grid_size {
-                i += 1;
-                let center = Vec3::new(x as f32 + 0.5, y as f32 + 0.5, 0.0);
-                let c = 0.5;
-                let color = Vec4::new(c, c, c, 1.0);
-                let color = if i % 2 == 0 { color * 0.9 } else { color };
-
-                let floor = floor_vertices(center, color);
-                builder.push_vertices(&floor);
-            }
-        }
-
-        builder.build();
-    }
-
-    pub fn draw_builder<'a>(&'a mut self, gl: &'a glow::Context) -> DrawBuilder<'a> {
-        DrawBuilder::new(self, gl)
+    pub fn draw_builder<'a>(&'a mut self, gl: &'a glow::Context, camera:&'a dyn Camera) -> DrawBuilder<'a> {
+        DrawBuilder::new(self, gl, camera)
     }
 }

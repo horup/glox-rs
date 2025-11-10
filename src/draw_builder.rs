@@ -7,6 +7,7 @@ pub struct DrawBuilder<'a> {
     gl: &'a glow::Context,
     first: usize,
     count: usize,
+    camera:&'a dyn Camera
 }
 
 impl<'a> DrawBuilder<'a> {
@@ -21,7 +22,7 @@ impl<'a> DrawBuilder<'a> {
         self
     }
 
-    pub fn new(renderer: &'a mut Glox, gl: &'a glow::Context) -> Self {
+    pub fn new(renderer: &'a mut Glox, gl: &'a glow::Context, camera:&'a dyn Camera) -> Self {
         unsafe {
             let program = renderer.program.expect("no program");
             let vertex_buffer = renderer.vertex_buffers[renderer.vertex_buffer_current];
@@ -45,7 +46,7 @@ impl<'a> DrawBuilder<'a> {
             gl.generate_mipmap(glow::TEXTURE_2D);
             gl.bind_buffer(glow::ARRAY_BUFFER, Some(vertex_buffer));
             gl.use_program(Some(program));
-            let view_projection = renderer.camera.view_projection();
+            let view_projection = camera.view_projection();
             gl.uniform_matrix_4_f32_slice(
                 gl.get_uniform_location(program, "view_projection").as_ref(),
                 false,
@@ -68,6 +69,7 @@ impl<'a> DrawBuilder<'a> {
                 gl,
                 first,
                 count: 0,
+                camera
             }
         }
     }
@@ -97,7 +99,7 @@ impl<'a> DrawBuilder<'a> {
         self
     }
 
-    pub fn build(self) {
+    pub fn finish(self) {
         unsafe {
             self.gl.blend_func(glow::ONE, glow::ONE_MINUS_SRC_ALPHA);
             self.gl.enable(glow::BLEND);
