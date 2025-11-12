@@ -84,10 +84,25 @@ impl ggsdk::GGApp for App {
                 if cell == 1 {
                     let x_i = x as i32;
                     let y_i = y as i32;
-                    walls.insert((x_i, y_i, true), ()); // top wall
-                    walls.insert((x_i + 1, y_i, false), ()); // right wall
-                    walls.insert((x_i, y_i + 1, true), ()); // bottom wall
-                    walls.insert((x_i, y_i, false), ()); // left wall
+
+                    // Check adjacent cells before adding walls
+                    let has_top = y > 0 && MAP[y-1][x] == 1;
+                    let has_right = x < size-1 && MAP[y][x+1] == 1;
+                    let has_bottom = y < size-1 && MAP[y+1][x] == 1;
+                    let has_left = x > 0 && MAP[y][x-1] == 1;
+
+                    if !has_top {
+                        walls.insert((x_i, y_i, true), ()); // top wall
+                    }
+                    if !has_right {
+                        walls.insert((x_i + 1, y_i, false), ()); // right wall
+                    }
+                    if !has_bottom {
+                        walls.insert((x_i, y_i + 1, true), ()); // bottom wall
+                    }
+                    if !has_left {
+                        walls.insert((x_i, y_i, false), ()); // left wall
+                    }
                 }
             }
         }
