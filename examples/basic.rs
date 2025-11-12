@@ -21,7 +21,7 @@ static MAP:[[u8;8];8] = [
 impl ggsdk::GGApp for App {
     fn init(&mut self, g: ggsdk::InitContext) {
         self.glox.init(g.gl);
-        self.camera.eye = Vec3::new(0.0, -10.0, 0.5);
+        self.camera.eye = Vec3::new(0.0, -10.0, 10.0);
         self.camera.target = Vec3::default();
 
         g.assets.load::<GGAtlas>("examples/wall_1x1.png", "wall");
