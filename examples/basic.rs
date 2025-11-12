@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use ggsdk::{GGAtlas, GGRunOptions, egui::Key};
 use glam::{Vec2, Vec3, Vec4};
+use glow::HasContext;
 use glox::{Glox, OrbitalCamera};
 
 #[derive(Default)]
@@ -10,7 +11,7 @@ struct App {
     pub orbital_camera: OrbitalCamera
 }
 
-static MAP:[[u8;8];8] = [
+/*static MAP:[[u8;8];8] = [
     [1,1,1,1,1,1,1,1],
     [1,0,0,0,1,0,0,1],
     [1,0,0,0,0,0,0,1],
@@ -18,7 +19,13 @@ static MAP:[[u8;8];8] = [
     [1,1,1,1,1,0,0,1],
     [1,0,0,0,0,0,0,1],
     [1,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1]];
+    [1,1,1,1,1,1,1,1]];*/
+
+
+    static MAP:[[u8;2];2] = [
+    [1,1],
+    [1,0],
+    ];
 
 impl ggsdk::GGApp for App {
     fn init(&mut self, g: ggsdk::InitContext) {
@@ -73,7 +80,10 @@ impl ggsdk::GGApp for App {
         let texture = g.painter.texture(texture.texture_id()).unwrap();
         let camera_dir= self.orbital_camera.direction();
         let gl = g.painter.gl();
-
+        unsafe {
+            gl.enable(glow::DEPTH_TEST);
+            gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
+        }
         // draw walls
         let mut walls = HashMap::new();
         let size = MAP.len();
@@ -111,6 +121,7 @@ impl ggsdk::GGApp for App {
         let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
         draw.bind_texture(Some(texture));
 
+        let mut c = 0;
         for (x,y ,top) in walls.keys() {
             let n = match top {
                 true => Vec3::new(0.0, 1.0, 0.0),
@@ -121,18 +132,11 @@ impl ggsdk::GGApp for App {
                 false => Vec3::new(*x as f32, *y as f32 + 0.5, 0.0),
             };
             draw.push_vertices(&glox::wall_vertices(p, 1.0, Vec4::splat(1.0), n));
+            c += 1;
         }
 
-      /*  for (x, y, top) in walls.drain(..) {
-            let n = match top {
-                true => Vec3::new(0.0, 1.0, 0.0),
-                false => Vec3::new(1.0, 0.0, 0.0),
-            };
-            draw.push_vertices(&glox::wall_vertices((x, y, 0.0).into(), 1.0, Vec4::splat(1.0), n));
-
-        }*/
-      //  draw.push_vertices(&glox::billboard_vertices(Default::default(), Vec4::splat(1.0), camera_dir, Vec2::splat(1.0)));
         draw.finish();
+        self.glox.swap();
     }
 }
 
