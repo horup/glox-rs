@@ -64,9 +64,9 @@ impl ggsdk::GGApp for App {
         let d = g.dt;
         let speed = 10.0;
         let f = move_vec.extend(0.0) * d * speed;
+        self.orbital_camera.move_self(f);
 
-        self.orbital_camera.rotate_self(rot * d);
-        self.orbital_camera.eye += f;
+        self.orbital_camera.rotate_self(rot * d * 2.0);
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
@@ -111,7 +111,6 @@ impl ggsdk::GGApp for App {
             }
         }
 
-
         let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
         draw.bind_texture(Some(texture));
 
@@ -126,7 +125,6 @@ impl ggsdk::GGApp for App {
             };
             draw.push_vertices(&glox::wall_vertices(p, 1.0, Vec4::splat(1.0), n));
         }
-
         draw.finish();
         self.glox.swap();
     }
