@@ -11,7 +11,7 @@ struct App {
     pub orbital_camera: OrbitalCamera
 }
 
-/*static MAP:[[u8;8];8] = [
+static MAP:[[u8;8];8] = [
     [1,1,1,1,1,1,1,1],
     [1,0,0,0,1,0,0,1],
     [1,0,0,0,0,0,0,1],
@@ -19,13 +19,7 @@ struct App {
     [1,1,1,1,1,0,0,1],
     [1,0,0,0,0,0,0,1],
     [1,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1]];*/
-
-
-    static MAP:[[u8;2];2] = [
-    [1,1],
-    [1,0],
-    ];
+    [1,1,1,1,1,1,1,1]];
 
 impl ggsdk::GGApp for App {
     fn init(&mut self, g: ggsdk::InitContext) {
@@ -121,7 +115,6 @@ impl ggsdk::GGApp for App {
         let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
         draw.bind_texture(Some(texture));
 
-        let mut c = 0;
         for (x,y ,top) in walls.keys() {
             let n = match top {
                 true => Vec3::new(0.0, 1.0, 0.0),
@@ -132,7 +125,6 @@ impl ggsdk::GGApp for App {
                 false => Vec3::new(*x as f32, *y as f32 + 0.5, 0.0),
             };
             draw.push_vertices(&glox::wall_vertices(p, 1.0, Vec4::splat(1.0), n));
-            c += 1;
         }
 
         draw.finish();
