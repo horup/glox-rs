@@ -214,6 +214,14 @@ impl ggsdk::GGApp for App {
         }
 
 
+        // draw fps camera pos if orbital camera
+        if self.chosen_camera == ChosenCamera::Orbital {
+            let p = self.fps_camera.eye;
+            let mut draw = self.glox.draw_builder(gl, camera);
+            draw.push_vertices(&glox::billboard_vertices(Vec3::new(p.x, p.y, 0.0), Vec4::splat(1.0), camera_dir, Vec2::splat(1.0)));
+            draw.finish();
+        }
+
 
         self.glox.swap();
     }
