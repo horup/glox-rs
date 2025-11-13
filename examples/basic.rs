@@ -138,6 +138,20 @@ impl ggsdk::GGApp for App {
         }
         draw.finish();
 
+        let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
+        draw.bind_texture(Some(texture));
+        for y in 0..size {
+            for x in 0..size {
+                if MAP[y][x] != 1 {
+                    continue;
+                }
+                let p = Vec3::new(x as f32 + 0.5, y as f32 + 0.5, 1.0);
+                let color = Vec4::new(0.2, 0.2, 0.2, 1.0);
+                draw.push_vertices(&glox::floor_vertices(p, color));
+            }
+        }
+        draw.finish();
+
 
         self.glox.swap();
     }
