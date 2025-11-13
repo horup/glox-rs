@@ -80,6 +80,7 @@ impl ggsdk::GGApp for App {
         g.egui_ctx.input(|x| {
             let r = x.content_rect();
             self.orbital_camera.viewport_size = Vec2::new(r.width(), r.height());
+            self.fps_camera.viewport_size = Vec2::new(r.width(), r.height());
 
             if x.key_down(Key::W) {
                 move_vec.y = 1.0;
