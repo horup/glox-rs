@@ -152,3 +152,52 @@ impl Camera for OrbitalCamera {
         self.eye
     }
 }
+
+
+#[derive(Default)]
+/// A first-person camera with pitch and yaw rotation.
+pub struct FirstPersonCamera {
+    pub eye: Vec3,
+    pub direction: Vec3,
+    pub viewport_size: Vec2,
+}
+
+impl FirstPersonCamera {
+    /// Create a new first-person camera with default forward direction.
+    pub fn new(eye: Vec3, viewport_size: Vec2) -> Self {
+        Self {
+            eye,
+            direction: Vec3::new(0.0, 1.0, 0.0), // forward
+            viewport_size,
+        }
+    }
+
+    /// Move the camera forward/backward and left/right relative to its current orientation.
+    pub fn move_self(&mut self, d: Vec3) {
+        let forward = self.direction;
+        let right = forward.cross(Vec3::Z).normalize_or(Vec3::new(1.0, 0.0, 0.0));
+        let up = Vec3::Z;
+
+        let movement = d.x * right + d.y * forward + d.z * up;
+        self.eye += movement;
+    }
+}
+
+impl Camera for FirstPersonCamera {
+    fn viewport_size(&self) -> Vec2 {
+        self.viewport_size
+    }
+
+    fn view(&self) -> Mat4 {
+        let up = Vec3::Z;
+        Mat4::look_to_rh(self.eye, self.direction, up)
+    }
+
+    fn direction(&self) -> Vec3 {
+        self.direction
+    }
+
+    fn eye(&self) -> Vec3 {
+        self.eye
+    }
+}
