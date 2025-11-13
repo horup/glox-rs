@@ -11,13 +11,14 @@ struct App {
     pub orbital_camera: OrbitalCamera
 }
 
+
 static MAP:[[u8;8];8] = [
     [1,1,1,1,1,1,1,1],
-    [1,0,0,0,1,0,0,1],
+    [1,2,0,0,1,0,2,1],
     [1,0,0,0,0,0,0,1],
-    [1,0,0,0,1,0,0,1],
+    [1,0,0,3,1,0,0,1],
     [1,1,1,1,1,0,0,1],
-    [1,0,0,0,0,0,0,1],
+    [1,3,0,0,0,0,0,1],
     [1,0,0,0,0,0,0,1],
     [1,1,1,1,1,1,1,1]];
 
@@ -112,6 +113,7 @@ impl ggsdk::GGApp for App {
         }
 
 
+        // draw all walls
         let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
         draw.push_vertices(&glox::plane_vertices(Default::default(), Vec4::new(0.4,0.4,0.4,1.0), 1024.0));
         draw.finish();
@@ -138,6 +140,8 @@ impl ggsdk::GGApp for App {
         }
         draw.finish();
 
+
+        // draw top of block
         let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
         draw.bind_texture(Some(texture));
         for y in 0..size {
@@ -151,6 +155,29 @@ impl ggsdk::GGApp for App {
             }
         }
         draw.finish();
+        
+        // draw some sprites / billboards
+        for y in 0..size {
+            for x in 0..size {
+                let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
+                //draw.bind_texture(Some(texture));
+                let id = MAP[y][x];
+                match id {
+                    2=>{
+
+                    },
+                    3=>{
+                    },
+                    _=>{
+                        continue;
+                    }
+                };
+                let p = Vec3::new(x as f32 + 0.5, y as f32 + 0.5, 0.0);
+                draw.push_vertices(&glox::billboard_vertices(p, Vec4::splat(1.0), camera_dir, Vec2::splat(1.0)));
+                draw.finish();
+            }
+        }
+
 
 
         self.glox.swap();
