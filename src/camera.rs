@@ -5,16 +5,21 @@ use glam::{Mat4, Vec2, Vec3, Vec4, Vec4Swizzles};
 use crate::Ray;
 
 pub trait Camera {
+    /// Returns the size of the viewport as a Vec2 (width, height).
     fn viewport_size(&self) -> Vec2;
+    /// Returns the view matrix of the camera.
     fn view(&self) -> Mat4;
+    /// Returns the projection matrix of the camera.
     fn projection(&self) -> Mat4 {
         glam::Mat4::perspective_rh_gl(PI / 4.0, self.aspect(), 0.1, 1024.0)
     }
 
+    /// Returns the combined view-projection matrix of the camera.
     fn view_projection(&self) -> Mat4 {
         self.projection() * self.view()
     }
 
+    /// Returns the aspect ratio of the camera's viewport.
     fn aspect(&self) -> f32 {
         let viewport = self.viewport_size();
         if viewport.x == 0.0 {
@@ -23,6 +28,7 @@ pub trait Camera {
         viewport.x / viewport.y
     }
 
+    /// Converts a world position (Vec3) to screen coordinates (Vec2).
     fn world_to_screen(&self, world_pos: Vec3) -> Vec2 {
         let p = self.view_projection() * world_pos.extend(1.0);
         let p = p / p.w;
@@ -34,9 +40,14 @@ pub trait Camera {
         )
     }
 
+    /// Returns the direction vector of the camera.
     fn direction(&self) -> Vec3;
+
+    /// Returns the eye (position) of the camera.
     fn eye(&self) -> Vec3;
 
+    /// Generates a ray from the camera through a given screen position.
+    /// The screen position is given in pixel coordinates.
     fn screen_ray(&self, screen_pos: Vec2) -> Ray {
         let inv_vp = self.view_projection().inverse();
         let viewport = self.viewport_size();
@@ -59,6 +70,7 @@ pub trait Camera {
 }
 
 #[derive(Default)]
+/// An orbital camera that orbits around a target point.
 pub struct OrbitalCamera {
     pub eye: Vec3,
     pub target: Vec3,
@@ -66,6 +78,7 @@ pub struct OrbitalCamera {
 }
 
 impl OrbitalCamera {
+    /// Zoom the camera in or out by moving the eye position closer to or further from the target.
     pub fn zoom_self(&mut self, delta: f32) {
         let direction = (self.target - self.eye).normalize_or(Vec3::new(0.0, 0.0, 1.0));
         let new_eye = self.eye + direction * delta;
@@ -81,6 +94,7 @@ impl OrbitalCamera {
         }
     }
 
+    /// Rotate the camera around the target point by a given angle in radians.
     pub fn rotate_self(&mut self, r: f32) {
         let direction = self.eye - self.target;
         let rotation = Mat4::from_axis_angle(Vec3::Z, r);
@@ -88,6 +102,8 @@ impl OrbitalCamera {
         self.eye = self.target + rotated_direction;
     }
 
+    /// Move the camera's eye and target positions by a given delta vector.
+    /// The movement is relative to the camera's current orientation.
     pub fn move_self(&mut self, d: Vec3) {
         // Calculate forward direction ignoring vertical (Z) component
         let mut forward = self.target - self.eye;
@@ -105,6 +121,7 @@ impl OrbitalCamera {
         self.target += movement;
     }
 
+    /// Get the normalized direction vector from the eye to the target.
     pub fn direction(&self) -> Vec3 {
         let v = self.target - self.eye;
         v.normalize_or(Vec3::new(1.0, 0.0, 0.0))
