@@ -119,11 +119,17 @@ impl ggsdk::GGApp for App {
                 true => Vec3::new(0.0, 1.0, 0.0),
                 false => Vec3::new(1.0, 0.0, 0.0),
             };
+            let c = 0.5;
+            let color = match top {
+                true => Vec4::new(1.0, 1.0, 1.0, 1.0),
+                false => Vec4::new(c, c, c, 1.0),
+            };
             let p = match top {
                 true => Vec3::new(*x as f32 + 0.5, *y as f32, 0.0),
                 false => Vec3::new(*x as f32, *y as f32 + 0.5, 0.0),
             };
-            draw.push_vertices(&glox::wall_vertices(p, 1.0, Vec4::splat(1.0), n));
+            
+            draw.push_vertices(&glox::wall_vertices(p, 1.0, color, n));
         }
         draw.finish();
         self.glox.swap();
