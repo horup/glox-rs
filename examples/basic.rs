@@ -1,16 +1,27 @@
 use std::collections::HashMap;
 
-use ggsdk::{GGAtlas, GGRunOptions, egui::Key};
+use ggsdk::{GGAtlas, GGRunOptions, egui::{self, Key}};
 use glam::{Vec2, Vec3, Vec4};
 use glow::HasContext;
 use glox::{Glox, OrbitalCamera};
 
+#[derive(PartialEq, Eq)]
+pub enum ChosenCamera { 
+    Orbital,
+    FirstPerson
+}
+impl Default for ChosenCamera {
+    fn default() -> Self {
+        Self::Orbital
+    }
+}
+
 #[derive(Default)]
 struct App {
     pub glox: Glox,
-    pub orbital_camera: OrbitalCamera
+    pub orbital_camera: OrbitalCamera,
+    pub chosen_camera: ChosenCamera
 }
-
 
 static MAP:[[u8;8];8] = [
     [1,1,1,1,1,1,1,1],
@@ -35,8 +46,11 @@ impl ggsdk::GGApp for App {
         g.assets.load::<GGAtlas>("examples/imgs/chairs_1x1.png", "chairs");
     }
 
-    fn update(&mut self, _: ggsdk::UpdateContext) {
-
+    fn update(&mut self, g: ggsdk::UpdateContext) {
+        egui::Window::new("Controls").show(g.egui_ctx, |ui|{
+            ui.radio_value(&mut self.chosen_camera, ChosenCamera::Orbital, "Orbital Camera");
+            ui.radio_value(&mut self.chosen_camera, ChosenCamera::FirstPerson, "First Person Camera");
+        });
     }
 
     fn update_glow(&mut self, g: ggsdk::UpdateContext) {
