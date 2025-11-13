@@ -16,10 +16,10 @@ static MAP:[[u8;8];8] = [
     [1,1,1,1,1,1,1,1],
     [1,2,0,0,1,0,2,1],
     [1,0,0,0,0,0,0,1],
-    [1,0,0,3,1,0,0,1],
+    [1,4,0,3,1,0,0,1],
     [1,1,1,1,1,0,0,1],
     [1,3,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,5,1],
     [1,1,1,1,1,1,1,1]];
 
 impl ggsdk::GGApp for App {
@@ -166,16 +166,27 @@ impl ggsdk::GGApp for App {
                 let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
                 //draw.bind_texture(Some(texture));
                 let id = MAP[y][x];
-                match id {
+                let texture = match id {
                     2=>{
-
+                       "cross"
                     },
                     3=>{
+                        "plant"
+                    },
+                    4=>{
+                        "chairs"
+                    },
+                    5=>{
+                        "lamp"
                     },
                     _=>{
                         continue;
                     }
                 };
+                if let Some(atlas) = g.assets.get::<GGAtlas>(texture) {
+                    let texture = g.painter.texture(atlas.texture_id()).unwrap();
+                    draw.bind_texture(texture.into());
+                }
                 let p = Vec3::new(x as f32 + 0.5, y as f32 + 0.5, 0.0);
                 draw.push_vertices(&glox::billboard_vertices(p, Vec4::splat(1.0), camera_dir, Vec2::splat(1.0)));
                 draw.finish();
