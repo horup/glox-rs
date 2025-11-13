@@ -15,7 +15,7 @@ pub enum ChosenCamera {
 }
 impl Default for ChosenCamera {
     fn default() -> Self {
-        Self::Orbital
+        Self::FirstPerson
     }
 }
 
