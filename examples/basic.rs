@@ -28,7 +28,11 @@ impl ggsdk::GGApp for App {
         self.orbital_camera.eye = Vec3::new(0.0, -10.0, 10.0);
         self.orbital_camera.target = Vec3::default();
 
-        g.assets.load::<GGAtlas>("examples/wall_1x1.png", "wall");
+        g.assets.load::<GGAtlas>("examples/imgs/wall_1x1.png", "wall");
+        g.assets.load::<GGAtlas>("examples/imgs/cross_1x1.png", "cross");
+        g.assets.load::<GGAtlas>("examples/imgs/lamp_1x1.png", "lamp");
+        g.assets.load::<GGAtlas>("examples/imgs/plant_1x1.png", "plant");
+        g.assets.load::<GGAtlas>("examples/imgs/chairs_1x1.png", "chairs");
     }
 
     fn update(&mut self, _: ggsdk::UpdateContext) {
