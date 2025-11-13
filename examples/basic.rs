@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use ggsdk::{GGAtlas, GGRunOptions, egui::{self, Key}};
 use glam::{Vec2, Vec3, Vec4};
 use glow::HasContext;
-use glox::{Glox, OrbitalCamera};
+use glox::{Camera, FirstPersonCamera, Glox, OrbitalCamera};
 
 #[derive(PartialEq, Eq)]
 pub enum ChosenCamera { 
@@ -20,6 +20,7 @@ impl Default for ChosenCamera {
 struct App {
     pub glox: Glox,
     pub orbital_camera: OrbitalCamera,
+    pub fps_camera: FirstPersonCamera,
     pub chosen_camera: ChosenCamera
 }
 
@@ -38,6 +39,7 @@ impl ggsdk::GGApp for App {
         self.glox.init(g.gl);
         self.orbital_camera.eye = Vec3::new(0.0, -10.0, 10.0);
         self.orbital_camera.target = Vec3::default();
+        self.fps_camera.eye = Vec3::new(2.5, 2.5, 0.5);
 
         g.assets.load::<GGAtlas>("examples/imgs/wall_1x1.png", "wall");
         g.assets.load::<GGAtlas>("examples/imgs/cross_1x1.png", "cross");
@@ -89,9 +91,13 @@ impl ggsdk::GGApp for App {
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
+        let camera:&dyn Camera = match self.chosen_camera {
+            ChosenCamera::Orbital => &self.orbital_camera,
+            ChosenCamera::FirstPerson => &self.fps_camera,
+        };
         let Some(texture) = g.assets.get::<GGAtlas>("wall") else { return };
         let texture = g.painter.texture(texture.texture_id()).unwrap();
-        let camera_dir= self.orbital_camera.direction();
+        let camera_dir= camera.direction();
         let gl = g.painter.gl();
         unsafe {
             gl.enable(glow::DEPTH_TEST);
@@ -132,11 +138,11 @@ impl ggsdk::GGApp for App {
 
 
         // draw all walls
-        let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
+        let mut draw = self.glox.draw_builder(gl, camera);
         draw.push_vertices(&glox::plane_vertices(Default::default(), Vec4::new(0.4,0.4,0.4,1.0), 1024.0));
         draw.finish();
 
-        let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
+        let mut draw = self.glox.draw_builder(gl, camera);
         draw.bind_texture(Some(texture));
 
         for (x,y ,top) in walls.keys() {
@@ -160,7 +166,7 @@ impl ggsdk::GGApp for App {
 
 
         // draw top of block
-        let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
+        let mut draw = self.glox.draw_builder(gl, camera);
         draw.bind_texture(Some(texture));
         for y in 0..size {
             for x in 0..size {
@@ -177,7 +183,7 @@ impl ggsdk::GGApp for App {
         // draw some sprites / billboards
         for y in 0..size {
             for x in 0..size {
-                let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
+                let mut draw = self.glox.draw_builder(gl, camera);
                 //draw.bind_texture(Some(texture));
                 let id = MAP[y][x];
                 let texture = match id {

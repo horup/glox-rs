@@ -167,7 +167,7 @@ impl FirstPersonCamera {
     pub fn new(eye: Vec3, viewport_size: Vec2) -> Self {
         Self {
             eye,
-            direction: Vec3::new(0.0, 1.0, 0.0), // forward
+            direction: Vec3::new(0.0, 1.0, 0.0),
             viewport_size,
         }
     }
