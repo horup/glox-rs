@@ -111,6 +111,11 @@ impl ggsdk::GGApp for App {
             }
         }
 
+
+        let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
+        draw.push_vertices(&glox::plane_vertices(Default::default(), Vec4::new(0.4,0.4,0.4,1.0), 1024.0));
+        draw.finish();
+
         let mut draw = self.glox.draw_builder(gl, &self.orbital_camera);
         draw.bind_texture(Some(texture));
 
@@ -132,6 +137,8 @@ impl ggsdk::GGApp for App {
             draw.push_vertices(&glox::wall_vertices(p, 1.0, color, n));
         }
         draw.finish();
+
+
         self.glox.swap();
     }
 }

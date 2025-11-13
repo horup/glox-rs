@@ -27,6 +27,23 @@ pub fn floor_vertices(center: Vec3, color: Vec4) -> [Vertex; 6] {
         Vertex::new(Vec3::new(c.x - half_size, c.y + half_size, c.z), color, [0.0, 0.0].into()),
     ]
 }
+
+pub fn plane_vertices(center: Vec3, color: Vec4, size: f32) -> [Vertex; 6] {
+    let half_size = size / 2.0;
+    let c = center;
+
+    [
+        Vertex::new(Vec3::new(c.x - half_size, c.y + half_size, c.z), color, [0.0, 0.0].into()),
+        Vertex::new(Vec3::new(c.x - half_size, c.y - half_size, c.z), color, [0.0, 1.0].into()),
+        Vertex::new(Vec3::new(c.x + half_size, c.y - half_size, c.z), color, [1.0, 1.0].into()),
+        Vertex::new(Vec3::new(c.x + half_size, c.y - half_size, c.z), color, [1.0, 1.0].into()),
+        Vertex::new(Vec3::new(c.x + half_size, c.y + half_size, c.z), color, [1.0, 0.0].into()),
+        Vertex::new(Vec3::new(c.x - half_size, c.y + half_size, c.z), color, [0.0, 0.0].into()),
+    ]
+}
+
+
+
 pub fn ply_vertices(source:&str) -> Result<Vec<Vertex>, ()> {
     let mut vertices = Vec::new();
     let p = ply::parser::Parser::<ply::ply::DefaultElement>::new();
@@ -125,6 +142,7 @@ pub fn line_vertices(start: Vec3, end: Vec3, width: f32, color: Vec4, camera_dir
         Vertex::new(start_left, color, [0.0, 0.0].into()),
     ]
 }   
+
 
 pub fn billboard_vertices(bottom_center: Vec3, color: Vec4, camera_dir: Vec3, scaling_factor: Vec2) -> [Vertex; 6] {
     let up = Vec3::new(0.0, 0.0, 1.0);
