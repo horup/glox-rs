@@ -62,7 +62,13 @@ impl ggsdk::GGApp for App {
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
         let painter = g.egui_ctx.layer_painter(LayerId::background());
-        painter.text((0.0, 0.0).into(), Align2::LEFT_TOP, "Press Tab to switch focus", FontId::default(), Color32::WHITE);
+        painter.text(
+            (0.0, 0.0).into(),
+            Align2::LEFT_TOP,
+            "Press Tab to switch focus",
+            FontId::default(),
+            Color32::WHITE,
+        );
         if self.focused {
             return;
         }
@@ -84,7 +90,8 @@ impl ggsdk::GGApp for App {
         let mut move_vec = Vec2::new(0.0, 0.0);
         let mut rot = 0.0;
         let mut pointer_delta = Vec2::new(0.0, 0.0);
-      
+
+        
         g.egui_ctx.input(|x| {
             let r = x.content_rect();
             self.orbital_camera.viewport_size = Vec2::new(r.width(), r.height());
@@ -94,10 +101,9 @@ impl ggsdk::GGApp for App {
                 self.focused = !self.focused;
             }
 
-            if self.focused == false { 
+            if self.focused == false {
                 return;
             }
-
 
             if x.key_down(Key::W) {
                 move_vec.y = 1.0;
