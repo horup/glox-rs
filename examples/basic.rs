@@ -108,7 +108,7 @@ impl ggsdk::GGApp for App {
         match self.chosen_camera {
             ChosenCamera::Orbital => {
                 self.orbital_camera.move_self(f);
-                self.orbital_camera.rotate_self(rot * d * 2.0);
+                self.orbital_camera.rotate_around(rot * d * 2.0);
             }
             ChosenCamera::FirstPerson => {
                 self.fps_camera.move_self(f / 2.0);

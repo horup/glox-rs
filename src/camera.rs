@@ -95,7 +95,7 @@ impl OrbitalCamera {
     }
 
     /// Rotate the camera around the target point by a given angle in radians.
-    pub fn rotate_self(&mut self, r: f32) {
+    pub fn rotate_around(&mut self, r: f32) {
         let direction = self.eye - self.target;
         let rotation = Mat4::from_axis_angle(Vec3::Z, r);
         let rotated_direction = rotation.transform_vector3(direction);
