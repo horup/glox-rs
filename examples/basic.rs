@@ -83,6 +83,7 @@ impl ggsdk::GGApp for App {
     fn update_glow(&mut self, g: ggsdk::UpdateContext) {
         let mut move_vec = Vec2::new(0.0, 0.0);
         let mut rot = 0.0;
+        let mut pointer_delta = Vec2::new(0.0, 0.0);
       
         g.egui_ctx.input(|x| {
             let r = x.content_rect();
@@ -116,6 +117,9 @@ impl ggsdk::GGApp for App {
             if x.key_down(Key::E) {
                 rot = 1.0;
             }
+
+            let delta = x.pointer.delta();
+            pointer_delta = Vec2::new(delta.x, delta.y);
         });
 
         let d = g.dt;
@@ -130,6 +134,9 @@ impl ggsdk::GGApp for App {
             ChosenCamera::FirstPerson => {
                 self.fps_camera.move_self(f / 2.0);
                 self.fps_camera.rotate_z(-rot * d * 4.0);
+
+                let senitivity = 0.01;
+                self.fps_camera.rotate_z(pointer_delta.x * -senitivity);
             }
         }
     }
