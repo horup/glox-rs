@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use ggsdk::{
     GGAtlas, GGRunOptions,
-    egui::{self, Key},
+    egui::{self, Align2, Color32, FontId, Key, LayerId},
 };
 use glam::{Vec2, Vec3, Vec4};
 use glow::HasContext;
@@ -25,6 +25,7 @@ struct App {
     pub orbital_camera: OrbitalCamera,
     pub fps_camera: FirstPersonCamera,
     pub chosen_camera: ChosenCamera,
+    pub focused: bool,
 }
 
 static MAP: [[u8; 8]; 8] = [
@@ -60,6 +61,11 @@ impl ggsdk::GGApp for App {
     }
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
+        let painter = g.egui_ctx.layer_painter(LayerId::background());
+        painter.text((0.0, 0.0).into(), Align2::LEFT_TOP, "Press Tab to switch focus", FontId::default(), Color32::WHITE);
+        if self.focused {
+            return;
+        }
         egui::Window::new("Controls").show(g.egui_ctx, |ui| {
             ui.radio_value(
                 &mut self.chosen_camera,
@@ -77,10 +83,21 @@ impl ggsdk::GGApp for App {
     fn update_glow(&mut self, g: ggsdk::UpdateContext) {
         let mut move_vec = Vec2::new(0.0, 0.0);
         let mut rot = 0.0;
+      
         g.egui_ctx.input(|x| {
             let r = x.content_rect();
             self.orbital_camera.viewport_size = Vec2::new(r.width(), r.height());
             self.fps_camera.viewport_size = Vec2::new(r.width(), r.height());
+
+            if x.key_pressed(Key::Tab) {
+                self.focused = !self.focused;
+            }
+
+            if self.focused == false { 
+                return;
+            }
+
+
             if x.key_down(Key::W) {
                 move_vec.y = 1.0;
             }
