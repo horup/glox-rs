@@ -81,7 +81,6 @@ impl ggsdk::GGApp for App {
             let r = x.content_rect();
             self.orbital_camera.viewport_size = Vec2::new(r.width(), r.height());
             self.fps_camera.viewport_size = Vec2::new(r.width(), r.height());
-
             if x.key_down(Key::W) {
                 move_vec.y = 1.0;
             }
@@ -105,9 +104,17 @@ impl ggsdk::GGApp for App {
         let d = g.dt;
         let speed = 10.0;
         let f = move_vec.extend(0.0) * d * speed;
-        self.orbital_camera.move_self(f);
 
-        self.orbital_camera.rotate_self(rot * d * 2.0);
+        match self.chosen_camera {
+            ChosenCamera::Orbital => {
+                self.orbital_camera.move_self(f);
+                self.orbital_camera.rotate_self(rot * d * 2.0);
+            }
+            ChosenCamera::FirstPerson => {
+                self.fps_camera.move_self(f);
+                self.orbital_camera.rotate_self(rot * d * 2.0);
+            }
+        }
     }
 
     fn paint_glow(&mut self, g: ggsdk::PaintGlowContext) {
