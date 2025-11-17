@@ -71,6 +71,7 @@ impl<'a> DrawBuilder<'a> {
             }
         }
     }
+    
     pub fn push_vertices(&mut self, vertices: &[Vertex]) -> &mut Self {
         if self.renderer.vertex_buffer_vertex_index + vertices.len()
             >= self.renderer.vertex_buffer_len
