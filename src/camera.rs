@@ -11,7 +11,12 @@ pub trait Camera {
     fn view(&self) -> Mat4;
     /// Returns the projection matrix of the camera.
     fn projection(&self) -> Mat4 {
-        glam::Mat4::perspective_rh_gl(PI / 4.0, self.aspect(), 0.1, 1024.0)
+        glam::Mat4::perspective_rh_gl(self.fov(), self.aspect(), 0.1, 1024.0)
+    }
+
+    /// Field of view in radians
+    fn fov(&self) -> f32 {
+        PI / 3.0 
     }
 
     /// Returns the combined view-projection matrix of the camera.
