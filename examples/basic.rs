@@ -91,18 +91,12 @@ impl ggsdk::GGApp for App {
         let mut move_vec = Vec2::new(0.0, 0.0);
         let mut rot = 0.0;
         let mut pointer_delta = Vec2::new(0.0, 0.0);
-
-        g.egui_ctx
-            .send_viewport_cmd(egui::ViewportCommand::CursorGrab(egui::CursorGrab::None));
-
-        let mut grabed_changed = false;
         g.egui_ctx.input(|x| {
             let r = x.content_rect();
             self.orbital_camera.viewport_size = Vec2::new(r.width(), r.height());
             self.fps_camera.viewport_size = Vec2::new(r.width(), r.height());
 
             if x.key_pressed(Key::Tab) {
-                grabed_changed = true;
                 self.cursor_grab = !self.cursor_grab;
             }
 
@@ -129,26 +123,26 @@ impl ggsdk::GGApp for App {
                 rot = 1.0;
             }
 
-            let delta = x.pointer.delta();
+            let delta = x.pointer.motion().unwrap_or_default();
             pointer_delta = Vec2::new(delta.x, delta.y);
         });
 
-        if grabed_changed {
-            match self.cursor_grab {
-                true => {
-                    g
-                    .egui_ctx
-                    .send_viewport_cmd(egui::ViewportCommand::CursorGrab(egui::CursorGrab::Confined));
-                    g.egui_ctx.send_viewport_cmd(egui::ViewportCommand::CursorVisible(false));
-                },
-                false => {
-                    g
-                    .egui_ctx
+        match self.cursor_grab {
+            true => {
+                g.egui_ctx
+                    .send_viewport_cmd(egui::ViewportCommand::CursorGrab(
+                        egui::CursorGrab::Locked,
+                    ));
+                g.egui_ctx
+                    .send_viewport_cmd(egui::ViewportCommand::CursorVisible(false));
+            }
+            false => {
+                g.egui_ctx
                     .send_viewport_cmd(egui::ViewportCommand::CursorGrab(egui::CursorGrab::None));
-                    g.egui_ctx.send_viewport_cmd(egui::ViewportCommand::CursorVisible(true));
-                },
-            };
-        }
+                g.egui_ctx
+                    .send_viewport_cmd(egui::ViewportCommand::CursorVisible(true));
+            }
+        };
 
         let d = g.dt;
         let speed = 10.0;
