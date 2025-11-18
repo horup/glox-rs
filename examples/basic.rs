@@ -61,7 +61,6 @@ impl ggsdk::GGApp for App {
     }
 
     fn update(&mut self, g: ggsdk::UpdateContext) {
-        //g.egui_ctx.send_viewport_cmd_to(id, ViewP);
         let painter = g.egui_ctx.layer_painter(LayerId::background());
         painter.text(
             (0.0, 0.0).into(),
