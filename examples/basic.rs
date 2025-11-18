@@ -130,9 +130,7 @@ impl ggsdk::GGApp for App {
         match self.cursor_grab {
             true => {
                 g.egui_ctx
-                    .send_viewport_cmd(egui::ViewportCommand::CursorGrab(
-                        egui::CursorGrab::Locked,
-                    ));
+                    .send_viewport_cmd(egui::ViewportCommand::CursorGrab(egui::CursorGrab::Locked));
                 g.egui_ctx
                     .send_viewport_cmd(egui::ViewportCommand::CursorVisible(false));
             }
@@ -159,6 +157,19 @@ impl ggsdk::GGApp for App {
                 let senitivity = 0.01;
                 self.fps_camera.change_yaw(pointer_delta.x * -senitivity);
                 self.fps_camera.change_pitch(pointer_delta.y * -senitivity);
+            }
+        }
+
+        let size = MAP.len();
+        // resolve collisions for fps camera
+        for y in 0..size {
+            for x in 0..size {
+                if MAP[y][x] != 1 {
+                    continue;
+                }
+                let block_pos = Vec3::new(x as f32 + 0.5, y as f32 + 0.5, 0.5);
+                let half_size = 0.5;
+                collision_resolve(&mut self.fps_camera.eye, 0.2, &block_pos, half_size);
             }
         }
     }
@@ -305,6 +316,43 @@ impl ggsdk::GGApp for App {
         }
 
         self.glox.swap();
+    }
+}
+
+fn sat_test(pos1: &Vec3, half_size: f32, pos2: &Vec3, half_size2: f32) -> bool {
+    let delta = *pos2 - *pos1;
+    let overlap_x = half_size + half_size2 - delta.x.abs();
+    let overlap_y = half_size + half_size2 - delta.y.abs();
+    let overlap_z = half_size + half_size2 - delta.z.abs();
+
+    if overlap_x > 0.0 && overlap_y > 0.0 && overlap_z > 0.0 {
+        true
+    } else {
+        false
+    }
+}
+
+fn collision_resolve(pos1: &mut Vec3, half_size1: f32, pos2: &Vec3, half_size2: f32) {
+    if !sat_test(pos1, half_size1, pos2, half_size2) {
+        return;
+    }
+    let delta = *pos2 - *pos1;
+    let overlap_x = half_size1 + half_size2 - delta.x.abs();
+    let overlap_y = half_size1 + half_size2 - delta.y.abs();
+    // Z is ignored for collision resolution
+
+    if overlap_x < overlap_y {
+        if delta.x > 0.0 {
+            pos1.x -= overlap_x;
+        } else {
+            pos1.x += overlap_x;
+        }
+    } else {
+        if delta.y > 0.0 {
+            pos1.y -= overlap_y;
+        } else {
+            pos1.y += overlap_y;
+        }
     }
 }
 
