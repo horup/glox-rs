@@ -156,9 +156,10 @@ impl ggsdk::GGApp for App {
             ChosenCamera::FirstPerson => {
                 self.fps_camera.move_self(f / 2.0);
                 self.fps_camera.rotate_z(-rot * d * 4.0);
-
                 let senitivity = 0.01;
                 self.fps_camera.rotate_z(pointer_delta.x * -senitivity);
+                self.fps_camera.rotate_y(pointer_delta.y * senitivity);
+
             }
         }
     }
