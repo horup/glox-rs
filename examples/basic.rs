@@ -154,7 +154,7 @@ impl ggsdk::GGApp for App {
                 self.orbital_camera.rotate_around(rot * d * 2.0);
             }
             ChosenCamera::FirstPerson => {
-                self.fps_camera.move_self(f / 2.0);
+                self.fps_camera.move_self_horizontal(f / 2.0);
                 self.fps_camera.change_yaw(-rot * d * 4.0);
                 let senitivity = 0.01;
                 self.fps_camera.change_yaw(pointer_delta.x * -senitivity);

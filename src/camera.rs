@@ -189,6 +189,19 @@ impl FirstPersonCamera {
         self.eye += movement;
     }
 
+    /// Move the camera forward/backward and left/right relative to its horizontal orientation only.
+    /// This ignores pitch and only uses the yaw for movement direction.
+    pub fn move_self_horizontal(&mut self, d: Vec3) {
+        let forward = self.forward();
+        let right = forward
+            .cross(Vec3::Z)
+            .normalize_or(Vec3::new(1.0, 0.0, 0.0));
+        let up = Vec3::Z;
+
+        let movement = d.x * right + d.y * forward + d.z * up;
+        self.eye += movement;
+    }
+
     /// Set the camera to look towards a specific direction vector.
     /// The direction vector will be normalized automatically.
     pub fn look_to(&mut self, direction: Vec3) {
