@@ -1,7 +1,5 @@
 use std::f32::consts::PI;
-
 use glam::{Mat4, Vec2, Vec3, Vec4, Vec4Swizzles};
-
 use crate::Ray;
 
 pub trait Camera {
