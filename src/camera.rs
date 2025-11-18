@@ -16,7 +16,7 @@ pub trait Camera {
 
     /// Field of view in radians
     fn fov(&self) -> f32 {
-        PI / 3.0 
+        PI / 3.0
     }
 
     /// Returns the combined view-projection matrix of the camera.
@@ -131,7 +131,6 @@ impl OrbitalCamera {
         let v = self.target - self.eye;
         v.normalize_or(Vec3::new(1.0, 0.0, 0.0))
     }
-
 }
 
 impl Camera for OrbitalCamera {
@@ -148,16 +147,15 @@ impl Camera for OrbitalCamera {
 
         Mat4::look_at_rh(self.eye, self.target, up)
     }
-    
+
     fn direction(&self) -> Vec3 {
         (self.target - self.eye).normalize_or_zero()
     }
-    
+
     fn eye(&self) -> Vec3 {
         self.eye
     }
 }
-
 
 /// A first-person camera with pitch and yaw rotation.
 pub struct FirstPersonCamera {
@@ -182,11 +180,38 @@ impl FirstPersonCamera {
     /// Move the camera forward/backward and left/right relative to its current orientation.
     pub fn move_self(&mut self, d: Vec3) {
         let forward = self.calculate_direction();
-        let right = forward.cross(Vec3::Z).normalize_or(Vec3::new(1.0, 0.0, 0.0));
+        let right = forward
+            .cross(Vec3::Z)
+            .normalize_or(Vec3::new(1.0, 0.0, 0.0));
         let up = Vec3::Z;
 
         let movement = d.x * right + d.y * forward + d.z * up;
         self.eye += movement;
+    }
+
+    /// Set the camera to look towards a specific direction vector.
+    /// The direction vector will be normalized automatically.
+    pub fn look_to(&mut self, direction: Vec3) {
+        let dir = direction.normalize();
+        
+        // Calculate yaw (rotation around Z axis)
+        // atan2(y, x) gives us the angle in the XY plane
+        self.yaw = dir.y.atan2(dir.x);
+        
+        // Calculate pitch (rotation around the horizontal plane)
+        // asin(z) gives us the vertical angle
+        self.pitch = dir.z.asin();
+        
+        // Clamp pitch to prevent camera from flipping over
+        let max_pitch = PI / 2.0 - 0.01;
+        self.pitch = self.pitch.clamp(-max_pitch, max_pitch);
+    }
+
+    /// Set the camera to look at a specific point in space.
+    /// This calculates the direction from the camera's eye position to the target point.
+    pub fn look_at(&mut self, target: Vec3) {
+        let direction = target - self.eye;
+        self.look_to(direction);
     }
 
     /// Rotate the camera around the Z axis by a given angle in radians.
@@ -194,13 +219,12 @@ impl FirstPersonCamera {
         self.yaw += angle;
     }
 
-
     /// Rotate the camera around the Y axis by a given angle in radians.
     /// Pitch is clamped to prevent the camera from flipping over.
     pub fn change_pitch(&mut self, angle: f32) {
         // Update pitch and clamp it to prevent flipping
         self.pitch += angle;
-        
+
         // Clamp pitch to prevent camera from flipping over
         // Limit to slightly less than 90 degrees to avoid gimbal lock
         let max_pitch = PI / 2.0 - 0.01;
@@ -217,13 +241,24 @@ impl FirstPersonCamera {
         self.yaw
     }
 
+    /// Get the forward direction vector of the camera.
+    /// This is the normalized direction the camera is currently facing.
+    pub fn forward(&self) -> Vec3 {
+        Vec3::new(
+            self.yaw.cos(),
+            self.yaw.sin(),
+            0.0,
+        ).normalize()
+    }
+
     /// Calculate the direction vector from yaw and pitch.
     fn calculate_direction(&self) -> Vec3 {
         Vec3::new(
             self.yaw.cos() * self.pitch.cos(),
             self.yaw.sin() * self.pitch.cos(),
             self.pitch.sin(),
-        ).normalize()
+        )
+        .normalize()
     }
 }
 
