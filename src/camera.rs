@@ -188,14 +188,14 @@ impl FirstPersonCamera {
     }
 
     /// Rotate the camera around the Z axis by a given angle in radians.
-    pub fn rotate_z(&mut self, angle: f32) {
+    pub fn change_yaw(&mut self, angle: f32) {
         let rotation = Mat4::from_axis_angle(Vec3::Z, angle);
         self.direction = rotation.transform_vector3(self.direction).normalize();
     }
 
 
     /// Rotate the camera around the Y axis by a given angle in radians.
-    pub fn rotate_y(&mut self, angle: f32) {
+    pub fn change_pitch(&mut self, angle: f32) {
         let rotation = Mat4::from_axis_angle(Vec3::Y, angle);
         self.direction = rotation.transform_vector3(self.direction).normalize();
     }
