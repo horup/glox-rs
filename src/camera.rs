@@ -164,6 +164,7 @@ pub struct FirstPersonCamera {
     pub eye: Vec3,
     pub direction: Vec3,
     pub viewport_size: Vec2,
+    pub pitch: f32,
 }
 
 impl Default for FirstPersonCamera {
@@ -172,6 +173,7 @@ impl Default for FirstPersonCamera {
             eye: Vec3::ZERO,
             direction: Vec3::new(1.0, 0.0, 0.0),
             viewport_size: Vec2::new(800.0, 600.0),
+            pitch: 0.0,
         }
     }
 }
@@ -189,15 +191,42 @@ impl FirstPersonCamera {
 
     /// Rotate the camera around the Z axis by a given angle in radians.
     pub fn change_yaw(&mut self, angle: f32) {
-        let rotation = Mat4::from_axis_angle(Vec3::Z, angle);
-        self.direction = rotation.transform_vector3(self.direction).normalize();
+        // Calculate current yaw from direction
+        let current_yaw = self.direction.y.atan2(self.direction.x);
+        let new_yaw = current_yaw + angle;
+        
+        // Update direction based on new yaw and current pitch
+        self.direction = Vec3::new(
+            new_yaw.cos() * self.pitch.cos(),
+            new_yaw.sin() * self.pitch.cos(),
+            self.pitch.sin(),
+        ).normalize();
     }
 
 
     /// Rotate the camera around the Y axis by a given angle in radians.
+    /// Pitch is clamped to prevent the camera from flipping over.
     pub fn change_pitch(&mut self, angle: f32) {
-        let rotation = Mat4::from_axis_angle(Vec3::Y, angle);
-        self.direction = rotation.transform_vector3(self.direction).normalize();
+        // Update pitch and clamp it to prevent flipping
+        self.pitch += angle;
+        
+        // Clamp pitch to prevent camera from flipping over
+        // Limit to slightly less than 90 degrees to avoid gimbal lock
+        let max_pitch = PI / 2.0 - 0.01;
+        self.pitch = self.pitch.clamp(-max_pitch, max_pitch);
+        
+        // Calculate new direction based on current yaw and clamped pitch
+        let yaw = self.direction.y.atan2(self.direction.x);
+        self.direction = Vec3::new(
+            yaw.cos() * self.pitch.cos(),
+            yaw.sin() * self.pitch.cos(),
+            self.pitch.sin(),
+        ).normalize();
+    }
+
+    /// Get the current pitch angle in radians.
+    pub fn pitch(&self) -> f32 {
+        self.pitch
     }
 }
 
