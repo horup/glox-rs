@@ -162,7 +162,7 @@ impl Camera for OrbitalCamera {
 /// A first-person camera with pitch and yaw rotation.
 pub struct FirstPersonCamera {
     pub eye: Vec3,
-    pub direction: Vec3,
+    pub yaw: f32,
     pub viewport_size: Vec2,
     pub pitch: f32,
 }
@@ -171,7 +171,7 @@ impl Default for FirstPersonCamera {
     fn default() -> Self {
         Self {
             eye: Vec3::ZERO,
-            direction: Vec3::new(1.0, 0.0, 0.0),
+            yaw: 0.0,
             viewport_size: Vec2::new(800.0, 600.0),
             pitch: 0.0,
         }
@@ -181,7 +181,7 @@ impl Default for FirstPersonCamera {
 impl FirstPersonCamera {
     /// Move the camera forward/backward and left/right relative to its current orientation.
     pub fn move_self(&mut self, d: Vec3) {
-        let forward = self.direction;
+        let forward = self.calculate_direction();
         let right = forward.cross(Vec3::Z).normalize_or(Vec3::new(1.0, 0.0, 0.0));
         let up = Vec3::Z;
 
@@ -191,16 +191,7 @@ impl FirstPersonCamera {
 
     /// Rotate the camera around the Z axis by a given angle in radians.
     pub fn change_yaw(&mut self, angle: f32) {
-        // Calculate current yaw from direction
-        let current_yaw = self.direction.y.atan2(self.direction.x);
-        let new_yaw = current_yaw + angle;
-        
-        // Update direction based on new yaw and current pitch
-        self.direction = Vec3::new(
-            new_yaw.cos() * self.pitch.cos(),
-            new_yaw.sin() * self.pitch.cos(),
-            self.pitch.sin(),
-        ).normalize();
+        self.yaw += angle;
     }
 
 
@@ -214,19 +205,25 @@ impl FirstPersonCamera {
         // Limit to slightly less than 90 degrees to avoid gimbal lock
         let max_pitch = PI / 2.0 - 0.01;
         self.pitch = self.pitch.clamp(-max_pitch, max_pitch);
-        
-        // Calculate new direction based on current yaw and clamped pitch
-        let yaw = self.direction.y.atan2(self.direction.x);
-        self.direction = Vec3::new(
-            yaw.cos() * self.pitch.cos(),
-            yaw.sin() * self.pitch.cos(),
-            self.pitch.sin(),
-        ).normalize();
     }
 
     /// Get the current pitch angle in radians.
     pub fn pitch(&self) -> f32 {
         self.pitch
+    }
+
+    /// Get the current yaw angle in radians.
+    pub fn yaw(&self) -> f32 {
+        self.yaw
+    }
+
+    /// Calculate the direction vector from yaw and pitch.
+    fn calculate_direction(&self) -> Vec3 {
+        Vec3::new(
+            self.yaw.cos() * self.pitch.cos(),
+            self.yaw.sin() * self.pitch.cos(),
+            self.pitch.sin(),
+        ).normalize()
     }
 }
 
@@ -237,12 +234,12 @@ impl Camera for FirstPersonCamera {
 
     fn view(&self) -> Mat4 {
         let up = Vec3::Z;
-        Mat4::look_to_rh(self.eye, self.direction, up)
+        Mat4::look_to_rh(self.eye, self.calculate_direction(), up)
         //Mat4::look_at_rh(self.eye, Default::default(), up)
     }
 
     fn direction(&self) -> Vec3 {
-        self.direction
+        self.calculate_direction()
     }
 
     fn eye(&self) -> Vec3 {
