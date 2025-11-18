@@ -158,8 +158,7 @@ impl ggsdk::GGApp for App {
                 self.fps_camera.change_yaw(-rot * d * 4.0);
                 let senitivity = 0.01;
                 self.fps_camera.change_yaw(pointer_delta.x * -senitivity);
-                self.fps_camera.change_pitch(pointer_delta.y * senitivity);
-
+                self.fps_camera.change_pitch(pointer_delta.y * -senitivity);
             }
         }
     }
